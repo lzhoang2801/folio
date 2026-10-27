@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Folio documents</title>
+<link rel="icon" type="image/png" href="/static/favicon.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+<aside id="sidebar" aria-label="Documents and model server">
+  <a class="brand" href="/"><strong>Folio</strong><span class="brand-sub">Documents</span></a>
+  <button type="button" id="new-run" class="primary">New document</button>
+  <div class="runs-head"><span>Runs</span><span id="runs-count"></span></div>
+  <nav id="runs" class="runs" aria-label="Saved runs"></nav>
+  <button type="button" id="endpoint" class="endpoint" title="Model server settings"><i id="endpoint-dot" class="dot" aria-hidden="true"></i><span id="endpoint-url">Model server settings</span></button>
+</aside>
+<main id="main">
+  <header class="toolbar idle">
+    <button type="button" id="menu" class="icon" aria-label="Toggle runs" aria-expanded="false">☰</button>
+    <h1 id="title">Document viewer</h1><span class="spacer"></span>
+    <div class="group run-control" aria-label="Image zoom">
+      <button type="button" id="zoom-out" aria-label="Zoom out">−</button><button type="button" id="zoom-fit" class="text" title="Fit image (0)">Fit</button><button type="button" id="zoom-in" aria-label="Zoom in">+</button>
+    </div>
+    <button type="button" id="download" class="toggle run-control" disabled>Download ZIP</button>
+  </header>
+  <section id="viewer" class="viewer" aria-label="Document review" hidden>
+    <div class="pane" id="left" tabindex="0" aria-label="All physical pages"><div id="page-stack"></div></div>
+    <div class="pane" id="right">
+      <header class="output-toolbar">
+        <select id="view" aria-label="Output view">
+          <option value="page">Page</option><option value="document">Document</option><option value="raw">Raw</option>
+        </select>
+        <div class="group" aria-label="Page navigation">
+          <button type="button" id="prev" aria-label="Previous page">‹</button>
+          <input id="pageno" type="number" min="1" aria-label="Page index">
+          <span id="count"></span><button type="button" id="next" aria-label="Next page">›</button>
+        </div>
+        <span id="page-label" aria-live="polite"></span>
+        <details id="type-filter" class="filter-menu">
+          <summary>Types <span id="type-count"></span></summary>
+          <div class="filters" id="filters" aria-label="Filter block labels"></div>
+        </details>
+      </header>
+      <div id="output-scroll" class="output-scroll" tabindex="0" aria-label="Parsed output"><div class="panel" id="panel"></div></div>
+      <aside id="block-inspector" class="block-inspector" aria-label="Selected block" aria-live="polite" hidden>
+        <div class="inspection-label"><strong id="inspection-type"></strong><span id="inspection-position"></span></div>
+        <div class="inspection-bounds"><span>Bounds</span><code id="inspection-bounds"></code></div>
+        <button type="button" id="clear-selection" aria-label="Clear block selection">×</button>
+      </aside>
+    </div>
+  </section>
+  <section id="empty" class="empty-state"><div><h2>No document open</h2><p>Choose a saved run, or drop a PDF or image to parse it.</p></div></section>
+</main>
+<div id="dropzone" class="dropzone" hidden>Drop a PDF or image</div>
+<dialog id="new-run-dialog" aria-labelledby="new-run-title">
+  <form id="new-run-form" class="sheet">
+    <h2 id="new-run-title">New document</h2>
+    <label class="file" id="file-label"><input type="file" id="file" accept=".pdf,image/*"><span id="file-text">Choose a PDF or image…</span></label>
+    <label class="field"><span>PDF pages</span><input id="pages" placeholder="All pages, or 1,3-5"></label>
+    <p id="form-error" class="error" role="alert" hidden></p>
+    <div class="actions"><button type="button" id="cancel" class="toggle">Cancel</button><button type="submit" id="submit" class="primary">Parse document</button></div>
+  </form>
+</dialog>
+<dialog id="settings-dialog" aria-labelledby="settings-title">
+  <form id="settings-form" class="sheet">
+    <h2 id="settings-title">Model server</h2>
+    <label class="field"><span>API base URL</span><input id="base-url" type="url" placeholder="http://127.0.0.1:8010/v1"></label>
+    <label class="field"><span>Model</span><input id="model-name" placeholder="lightonai/LightOnOCR-3-0.8B"></label>
+    <label class="field"><span>API key</span><input id="api-key" type="password" autocomplete="new-password" placeholder="Leave blank to keep current key"></label>
+    <label class="checkbox"><input id="clear-api-key" type="checkbox">Clear the current session key</label>
+    <p id="api-key-status" class="hint-line"></p>
+    <p id="endpoint-status" class="status" role="status" aria-live="polite"></p>
+    <div class="actions"><button type="button" id="settings-cancel" class="toggle">Cancel</button><button type="submit" id="settings-save" class="primary">Save and check</button></div>
+  </form>
+</dialog>
+<div id="toast" role="alert" hidden></div>
+<script src="https://cdn.jsdelivr.net/npm/marked@14.1.3/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.4.17/dist/purify.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<script type="module" src="/static/app.js"></script>
+</body>
+</html>
